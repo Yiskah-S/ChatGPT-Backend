@@ -2,43 +2,50 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from dotenv import load_dotenv
-import os
 from flask_cors import CORS
-from flask_login import LoginManager, current_user, login_user, logout_user
-from flask_security import check_password_hash, generate_password_hash, login_required
+from flask_login import LoginManager
+import os
 
+# Initialize Flask extensions
 login_manager = LoginManager()
 db = SQLAlchemy()
 migrate = Migrate()
+
+# Load environment variables
 load_dotenv()
 
 def create_app():
-    app = Flask(__name__)
-    app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+	# Initialize Flask app
+	app = Flask(__name__)
+	
+	# Load configuration from environment variables
+	app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("SQLALCHEMY_DATABASE_URI")
+	if not app.config["SQLALCHEMY_DATABASE_URI"]:
+		raise RuntimeError("SQLALCHEMY_DATABASE_URI is not set")
+	
+	# Configure Flask extensions
+	app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+	app.config['CORS_HEADERS'] = 'Content-Type'
+	
+	# Initialize SQLAlchemy and Migrate
+	db.init_app(app)
+	migrate.init_app(app, db)
 
-    app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("SQLALCHEMY_DATABASE_URI")
-    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+	# Import models
+	from .models.user import User
+	from .models.prompt import Prompt
+	from .models.response import Response
+	
+	# Initialize login manager
+	login_manager.init_app(app)
 
-    db.init_app(app)
-    migrate.init_app(app, db)
+	# Import routes and register blueprints
+	from .routes.user_routes import user_bp
+	app.register_blueprint(user_bp)
+	from .routes.prompt_routes import prompt_bp
+	app.register_blueprint(prompt_bp)
+	
+	# Initialize CORS
+	CORS(app)
 
-    from .models.user import User
-    from .models.prompt import Prompt
-
-
-
-    from .routes.user_routes import user_bp
-    app.register_blueprint(user_bp)
-
-    from .routes.prompt_routes import prompt_bp
-    app.register_blueprint(prompt_bp)
-
-
-
-    login_manager.init_app(app)
-    
-
-    CORS(app)
-    app.config['CORS_HEADERS'] = 'Content-Type'
-    
-    return app
+	return app
