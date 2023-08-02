@@ -17,15 +17,20 @@ def create_user():
 	if not username or not email or not password:
 		return jsonify({"error": "Incomplete user data."}), 400
 	
-	user = User.query.filter_by(email=email).first()
-	if user:
+	user_with_email = User.query.filter_by(email=email).first()
+	if user_with_email:
 		return jsonify({"error": "User with this email already exists."}), 409
+	
+	user_with_username = User.query.filter_by(username=username).first()
+	if user_with_username:
+		return jsonify({"error": "User with this username already exists."}), 409
 	
 	password_hash = generate_password_hash(password)
 	new_user = User(username=username, email=email, password=password_hash)
 	db.session.add(new_user)
 	db.session.commit()
 	return jsonify(new_user.to_dict()), 201
+
 
 # Get all users
 @user_bp.route('/users', methods=['GET'])
@@ -83,12 +88,4 @@ def delete_user():
     db.session.delete(current_user)
     db.session.commit()
     return jsonify({"message": "User deleted"}), 200
-
-# A route to handle user's prompts is not changed because it's similar to the example above
-# ...
-
-# The rest of your routes follow the same pattern as the example above.
-# It's recommended to refactor them in a similar way.
-
-# ...
 

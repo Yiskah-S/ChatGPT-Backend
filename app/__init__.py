@@ -1,9 +1,10 @@
-from flask import Flask
+from flask import Flask, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from dotenv import load_dotenv
 from flask_cors import CORS
 from flask_login import LoginManager
+from werkzeug.exceptions import Unauthorized
 import os
 
 # Initialize Flask extensions
@@ -14,6 +15,7 @@ migrate = Migrate()
 # Load environment variables
 load_dotenv()
 
+
 def create_app():
 	# Initialize Flask app
 	app = Flask(__name__)
@@ -22,6 +24,8 @@ def create_app():
 	app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("SQLALCHEMY_DATABASE_URI")
 	if not app.config["SQLALCHEMY_DATABASE_URI"]:
 		raise RuntimeError("SQLALCHEMY_DATABASE_URI is not set")
+	
+	app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY")
 	
 	# Configure Flask extensions
 	app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
@@ -35,6 +39,14 @@ def create_app():
 	from .models.user import User
 	from .models.prompt import Prompt
 	from .models.response import Response
+
+	@login_manager.user_loader
+	def load_user(user_id):
+		return User.query.get(int(user_id))
+	
+	@login_manager.unauthorized_handler
+	def unauthorized():
+		return jsonify({"error": "You must be logged in to access this page"}), 401
 	
 	# Initialize login manager
 	login_manager.init_app(app)
