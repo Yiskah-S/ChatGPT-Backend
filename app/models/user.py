@@ -1,3 +1,5 @@
+# user.py
+
 from app import db
 from flask_security import UserMixin
 from werkzeug.security import check_password_hash, generate_password_hash
@@ -9,7 +11,7 @@ class User(UserMixin, db.Model):
 	email = db.Column(db.String(120), unique=True, nullable=False)
 	password = db.Column(db.String(120), nullable=False)
 	active = db.Column(db.Boolean, default=True, nullable=False)
-	__table_args__ = (CheckConstraint('length(username) > 4'), )
+	__table_args__ = (CheckConstraint('length(username) > 1'), )
 
 	def to_dict(self):
 		user_dict = {
