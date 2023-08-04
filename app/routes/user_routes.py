@@ -1,10 +1,9 @@
-# user_routes.property
+# user_routes.py 
 
-from flask import Blueprint, jsonify, request
-from flask_login import login_user, logout_user, login_required, current_user
+from flask import Blueprint, jsonify, request, g
+from flask_login import current_user, login_user, logout_user, login_required
 from werkzeug.security import generate_password_hash
 from app.models.user import User, db
-from app.models.prompt import Prompt
 
 user_bp = Blueprint('user', __name__)
 
@@ -33,7 +32,6 @@ def create_user():
 	db.session.commit()
 	return jsonify(new_user.to_dict()), 201
 
-
 # Get all users
 @user_bp.route('/users', methods=['GET'])
 def get_users():
@@ -57,6 +55,7 @@ def login():
 
 # User logout
 @user_bp.route('/users/logout', methods=['POST'])
+@login_required
 def logout():
 	logout_user()
 	return jsonify({"message": "Logged out"}), 200
@@ -71,17 +70,24 @@ def get_user():
 @user_bp.route('/users/me', methods=['PATCH'])
 @login_required
 def update_user():
-    data = request.get_json()
-    username = data.get('username')
-    email = data.get('email')
-    
-    if username:
-        current_user.username = username
-    if email:
-        current_user.email = email
-        
-    db.session.commit()
-    return jsonify(current_user.to_dict()), 200
+	data = request.get_json()
+	username = data.get('username')
+	email = data.get('email')
+	
+	if username:
+		user_with_username = User.query.filter_by(username=username).first()
+		if user_with_username and user_with_username.id != current_user.id:
+			return jsonify({"error": "User with this username already exists."}), 409
+		current_user.username = username
+	
+	if email:
+		user_with_email = User.query.filter_by(email=email).first()
+		if user_with_email and user_with_email.id != current_user.id:
+			return jsonify({"error": "User with this email already exists."}), 409
+		current_user.email = email
+	
+	db.session.commit()
+	return jsonify(current_user.to_dict()), 200
 
 # Delete the current logged in user
 @user_bp.route('/users/me', methods=['DELETE'])
@@ -90,4 +96,3 @@ def delete_user():
     db.session.delete(current_user)
     db.session.commit()
     return jsonify({"message": "User deleted"}), 200
-
