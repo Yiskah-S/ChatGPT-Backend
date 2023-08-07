@@ -96,3 +96,8 @@ def delete_user():
     db.session.delete(current_user)
     db.session.commit()
     return jsonify({"message": "User deleted"}), 200
+
+@user_bp.route('/protected_resource')
+@login_required
+def protected_resource():
+    return jsonify({'message': 'This is a protected resource!', 'current_user_id': current_user.get_id()}), 200

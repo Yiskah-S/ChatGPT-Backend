@@ -7,6 +7,34 @@ from app.models.api_key import APIKey
 
 api_key_bp = Blueprint('api_key', __name__, url_prefix='/api-keys')
 
+@login_required
+@api_key_bp.route('/api-keys/<int:user_id>', methods=['POST'])
+def create_api_key(user_id):
+    data = request.get_json()
+    print("Received data:", data)
+    print(f"Current user id: {current_user.get_id()}")
+
+    api_keys = data.get('apiKeys')  # Assuming the front end sends 'apiKeys' as the key
+
+    if not api_keys:
+        return jsonify({"error": "No API keys provided."}), 400
+
+    # Assuming each item in the 'api_keys' list has 'api_type' and 'api_key' keys
+    for api_key in api_keys:
+        api_type = api_key.get('api_type')
+        api_key_value = api_key.get('api_key')
+
+        if not api_type or not api_key_value:
+            return jsonify({"error": "Incomplete API key data."}), 400
+
+        data['user_id'] = user_id
+        new_api_key = APIKey(api_type=api_type, api_key=api_key_value, user_id=user_id)
+        db.session.add(new_api_key)
+
+    db.session.commit()
+
+    return jsonify({"message": "API keys added successfully."}), 201
+
 # Route to get all API keys for the current user
 @login_required
 @api_key_bp.route('/', methods=['GET'])
@@ -45,20 +73,4 @@ def update_api_key(api_key_id):
     db.session.commit()
     return jsonify(api_key.to_dict()), 200
 
-@login_required
-@api_key_bp.route('/', methods=['POST'])
-def create_api_key():
-    data = request.get_json()
-    api_type = data.get('api_type')
-    api_key = data.get('api_key')
 
-    if not api_type or not api_key:
-        return jsonify({"error": "Incomplete API key data."}), 400
-
-    # You can add additional checks to validate the API type and key as needed
-
-    new_api_key = APIKey(api_type=api_type, api_key=api_key, user_id=current_user.id)
-    db.session.add(new_api_key)
-    db.session.commit()
-
-    return jsonify(new_api_key.to_dict()), 201

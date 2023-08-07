@@ -7,10 +7,12 @@ from app.models.prompt import Prompt
 
 prompt_bp = Blueprint('prompt', __name__, url_prefix='/prompts')
 
-@login_required
+# @login_required
 @prompt_bp.route('/prompts', methods=['POST'])
 def create_prompt():
 	data = request.get_json()
+	print("Received data:", data)
+	print(f"Current user id: {current_user.get_id()}")
 
 	# checking if required fields are present
 	required_fields = ["title", "category", "prompt"]
@@ -18,7 +20,7 @@ def create_prompt():
 		if field not in data or not data[field].strip():
 			return jsonify({ "error": f"{field.capitalize()} cannot be left blank"}), 400
 
-	data['user_id'] = current_user.get_id()
+	# data['user_id'] = current_user.get_id()
 	prompt = Prompt.from_dict(data)
 	db.session.add(prompt)
 	db.session.commit()

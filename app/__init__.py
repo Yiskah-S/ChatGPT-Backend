@@ -56,6 +56,7 @@ def create_app():
 
     # Initialize login manager
     login_manager.init_app(app)
+    login_manager.login_view = 'user.login'
 
     # Import routes and register blueprints
     from .routes.user_routes import user_bp
