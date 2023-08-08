@@ -54,21 +54,21 @@ def login():
 		return jsonify({"error": "Invalid username/password"}), 401
 
 # User logout
-@user_bp.route('/users/logout', methods=['POST'])
 @login_required
+@user_bp.route('/users/logout', methods=['POST'])
 def logout():
 	logout_user()
 	return jsonify({"message": "Logged out"}), 200
 
 # Get the current logged in user
-@user_bp.route('/users/me', methods=['GET'])
 @login_required
+@user_bp.route('/users/me', methods=['GET'])
 def get_user():
     return jsonify(current_user.to_dict()), 200
 
 # Update the current logged in user
-@user_bp.route('/users/me', methods=['PATCH'])
 @login_required
+@user_bp.route('/users/me', methods=['PATCH'])
 def update_user():
 	data = request.get_json()
 	username = data.get('username')
@@ -90,14 +90,27 @@ def update_user():
 	return jsonify(current_user.to_dict()), 200
 
 # Delete the current logged in user
-@user_bp.route('/users/me', methods=['DELETE'])
 @login_required
+@user_bp.route('/users/me', methods=['DELETE'])
 def delete_user():
     db.session.delete(current_user)
     db.session.commit()
     return jsonify({"message": "User deleted"}), 200
 
-@user_bp.route('/protected_resource')
 @login_required
+@user_bp.route('/protected_resource')
 def protected_resource():
     return jsonify({'message': 'This is a protected resource!', 'current_user_id': current_user.get_id()}), 200
+
+@login_required
+@user_bp.route('/dashboard', methods=['GET'])
+def dashboard():
+    user = User.query.get(current_user_id)
+    print("Current user ID:", current_user_id)
+    print("User:", user)
+
+    if user:
+        user_data = user.to_dict()
+        return jsonify(user_data), 200
+    else:
+        return jsonify({"message": "User not found"}), 404

@@ -33,8 +33,11 @@ def create_app():
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
     app.config['CORS_HEADERS'] = 'Content-Type'
 
-    # Initialize CORS
-    CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}})
+    # Get CORS_ORIGIN from the .env file
+    cors_origin = os.environ.get("CORS_ORIGIN")
+
+    # Configure CORS using the loaded value
+    CORS(app, resources={r"/*": {"origins": cors_origin}})
 
     # Import models
     from .models.user import User
@@ -63,8 +66,8 @@ def create_app():
     app.register_blueprint(user_bp)
     from .routes.prompt_routes import prompt_bp
     app.register_blueprint(prompt_bp, url_prefix='/prompt-library')
-    from .routes.api_key_routes import api_key_bp  
-    app.register_blueprint(api_key_bp, url_prefix='/api-keys')  # Register the blueprint for API keys
+    from .routes.api_key_routes import api_key_bp
+    app.register_blueprint(api_key_bp, url_prefix='/api-keys')
 
     print("Routes registered successfully!")
 

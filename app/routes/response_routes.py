@@ -62,8 +62,8 @@ def delete_prompt_response(prompt_id, response_id):
     db.session.commit()
     return jsonify({"message": "Response deleted"}), 200
 
-@user_bp.route('/users/me/prompts/<prompt_id>/responses/<response_id>/comments', methods=['GET'])
 @login_required
+@user_bp.route('/users/me/prompts/<prompt_id>/responses/<response_id>/comments', methods=['GET'])
 def get_user_prompt_response_comments(prompt_id, response_id):
     prompt = Prompt.query.get_or_404(prompt_id)
     if prompt.user_id != current_user.get_id():

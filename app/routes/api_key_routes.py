@@ -4,8 +4,20 @@ from flask_login import current_user, login_required
 from flask import Blueprint, jsonify, request
 from app import db
 from app.models.api_key import APIKey
+from app.models.user import User
 
 api_key_bp = Blueprint('api_key', __name__, url_prefix='/api-keys')
+
+@login_required
+def load_user_from_request(request):
+    token = request.headers.get("Authorization")
+    if token:
+        try:
+            user = User.query.get(int(user_id))
+            return user
+        except Exception as e:
+            print("Error loading user from request:", str(e))
+    return None
 
 @login_required
 @api_key_bp.route('/api-keys/<int:user_id>', methods=['POST'])

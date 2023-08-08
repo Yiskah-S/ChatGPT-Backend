@@ -1,5 +1,3 @@
-# user.py
-
 from app import db
 from flask_security import UserMixin
 from werkzeug.security import check_password_hash, generate_password_hash
@@ -36,7 +34,8 @@ class User(UserMixin, db.Model):
 	@classmethod
 	def from_dict(cls, request_body):
 		return cls(
-			username=request_body["username"],
-			email=request_body["email"],
-			password=generate_password_hash(request_body["password"]),
-		)
+            username=request_body["username"],
+            email=request_body["email"],
+            password=generate_password_hash(request_body["password"]),
+        )
+

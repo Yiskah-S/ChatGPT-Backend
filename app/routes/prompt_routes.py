@@ -7,7 +7,7 @@ from app.models.prompt import Prompt
 
 prompt_bp = Blueprint('prompt', __name__, url_prefix='/prompts')
 
-# @login_required
+@login_required
 @prompt_bp.route('/prompts', methods=['POST'])
 def create_prompt():
 	data = request.get_json()
