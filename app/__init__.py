@@ -69,6 +69,11 @@ def create_app():
     from .routes.api_key_routes import api_key_bp
     app.register_blueprint(api_key_bp)
 
+    # Debug statement
     print("Routes registered successfully!")
+    print(app.url_map)
+    # print("Current user:", User.query.get(1))
+    # print("Current user id:", User.query.get(1).get_id())
+    # print("Current user is authenticated:", User.query.get(1).is_authenticated)
 
     return app

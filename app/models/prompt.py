@@ -22,12 +22,12 @@ class Prompt(db.Model):
 		return prompt_dict
 
 	@classmethod
-	def from_dict(cls, request_body):
+	def from_dict(cls, request_body, user_id):
 		return cls(
 			title=request_body["title"],
 			category=request_body["category"],
 			prompt=request_body["prompt"],
-			user_id=request_body["user_id"],
+			user_id=user_id,
 		)
 
 	def update(self, data):

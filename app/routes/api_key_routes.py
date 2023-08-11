@@ -12,8 +12,6 @@ api_key_bp = Blueprint('api_key', __name__, url_prefix='/api-keys/<int:user_id>'
 @api_key_bp.route('/', methods=['GET'])
 def get_api_keys(user_id):
     print(f"Current user id: {current_user.get_id()}")
-    # if user_id != current_user.get_id():
-    #     return jsonify({"error": "Unauthorized to access these API keys."}), 403
 
     api_keys = APIKey.query.filter_by(user_id=user_id).all()
 
@@ -25,7 +23,7 @@ def get_api_keys(user_id):
     return jsonify(api_keys_data), 200
 
 @login_required
-@api_key_bp.route('/', methods=['PATCH'])
+@api_key_bp.route('/', methods=['PUT'])
 def update_api_key(user_id):
 	data = request.get_json()
 	print("Received data:", data)
@@ -48,30 +46,12 @@ def update_api_key(user_id):
 
 	return jsonify({"message": "API keys updated successfully."}), 200
 
-
-# @login_required
-# @api_key_bp.route('/', methods=['PATCH'])
-# def update_api_key(user_id):
-# 	data = request.get_json()
-# 	print("Received data:", data)
-# 	print(f"Current user id: {current_user.get_id()}")
-
-# 	# Uncomment if needed
-# 	# if user_id != current_user.get_id():
-# 	#     return jsonify({"error": "Unauthorized to update these API keys."}), 403
-
-# 	api_keys = data.get('apiKeys')
-
-# 	if not api_keys:
-# 		return jsonify({"error": "No API keys provided."}), 400
-
-# 	# Here you can add the code to update the API keys in the database
-# 	# Example:
-# 	for key_obj in api_keys:
-# 		key = APIKey.query.filter_by(user_id=user_id, api_type=key_obj['api_type']).first()
-# 		if key:
-# 			key.api_key = key_obj['api_key']
-
-# 	db.session.commit()
-
-# 	return jsonify({"message": "API keys updated successfully."}), 200
+@login_required
+@api_key_bp.route('/<int:api_key_id>', methods=['DELETE'])
+def delete_api_key(user_id, api_key_id):
+    api_key = APIKey.query.get(api_key_id)
+    if not api_key:
+        return jsonify({"error": "API key not found."}), 404
+    db.session.delete(api_key)
+    db.session.commit()
+    return jsonify({"message": "API key successfully deleted."}), 200
