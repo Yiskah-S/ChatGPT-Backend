@@ -65,9 +65,9 @@ def create_app():
     from .routes.user_routes import user_bp
     app.register_blueprint(user_bp)
     from .routes.prompt_routes import prompt_bp
-    app.register_blueprint(prompt_bp, url_prefix='/prompt-library')
+    app.register_blueprint(prompt_bp)
     from .routes.api_key_routes import api_key_bp
-    app.register_blueprint(api_key_bp, url_prefix='/api-keys')
+    app.register_blueprint(api_key_bp)
 
     print("Routes registered successfully!")
 

@@ -8,16 +8,16 @@ from app.models.user import User
 
 api_key_bp = Blueprint('api_key', __name__, url_prefix='/api-keys')
 
-@login_required
-def load_user_from_request(request):
-    token = request.headers.get("Authorization")
-    if token:
-        try:
-            user = User.query.get(int(user_id))
-            return user
-        except Exception as e:
-            print("Error loading user from request:", str(e))
-    return None
+# @login_required
+# def load_user_from_request(request):
+#     token = request.headers.get("Authorization")
+#     if token:
+#         try:
+#             user = User.query.get(int(user_id))
+#             return user
+#         except Exception as e:
+#             print("Error loading user from request:", str(e))
+#     return None
 
 @login_required
 @api_key_bp.route('/api-keys/<int:user_id>', methods=['POST'])
@@ -49,22 +49,15 @@ def create_api_key(user_id):
 
 # Route to get all API keys for the current user
 @login_required
-@api_key_bp.route('/', methods=['GET'])
-def get_api_keys():
-    api_keys = APIKey.query.filter_by(user_id=current_user.id).all()
+@api_key_bp.route('/api-keys/<int:user_id>/keys', methods=['GET'])
+def get_api_keys(user_id):
+    # data = request.get_json()
+    # print("Received data:", data)
+    # print(f"Current user id: {current_user.get_id()}")
+
+    api_keys = APIKey.query.filter_by(user_id=user_id).all()
     api_keys_data = [api_key.to_dict() for api_key in api_keys]
     return jsonify(api_keys_data), 200
-
-# Route to get an API key by its ID
-@login_required
-@api_key_bp.route('/<int:api_key_id>', methods=['GET'])
-def get_api_key_by_id(api_key_id):
-    api_key = APIKey.query.get(api_key_id)
-    if not api_key:
-        return jsonify({"error": "API key not found."}), 404
-    if api_key.user_id != current_user.id:
-        return jsonify({"error": "Unauthorized to access this API key."}), 403
-    return jsonify(api_key.to_dict()), 200
 
 # Route to update an API key by its ID
 @login_required
