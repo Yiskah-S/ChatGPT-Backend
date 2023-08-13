@@ -5,7 +5,7 @@ from flask_login import login_required, current_user, login_user, logout_user
 from app import db
 from app.models.prompt import Prompt
 
-prompt_bp = Blueprint('prompt', __name__, url_prefix='/prompts/<int:user_id>')
+prompt_bp = Blueprint('prompt', __name__, url_prefix='/prompts/<int:user_id>/')
 
 @login_required
 @prompt_bp.route('/', methods=['POST'])

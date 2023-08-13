@@ -51,7 +51,7 @@ def login():
 		login_user(user)
 		return jsonify(user.to_dict()), 200
 	else:
-		return jsonify({"error": "Invalid username/password"}), 401
+		return jsonify({"error": "User not found or password is incorrect"}), 404
 
 # User logout
 @login_required

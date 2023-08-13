@@ -7,7 +7,9 @@ from dotenv import load_dotenv
 from flask_cors import CORS
 from flask_login import LoginManager
 from werkzeug.exceptions import Unauthorized
+from flask_session import Session
 import os
+from datetime import timedelta
 
 # Initialize Flask extensions
 login_manager = LoginManager()
@@ -32,6 +34,13 @@ def create_app():
     # Configure Flask extensions
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
     app.config['CORS_HEADERS'] = 'Content-Type'
+
+    app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=1)
+    
+    # Additional session configuration
+    app.config['SESSION_TYPE'] = 'filesystem'
+    app.config['SESSION_PERMANENT'] = False
+    Session(app) # Initialize Flask-Session with app
 
     # Get CORS_ORIGIN from the .env file
     cors_origin = os.environ.get("CORS_ORIGIN")
@@ -68,6 +77,10 @@ def create_app():
     app.register_blueprint(prompt_bp)
     from .routes.api_key_routes import api_key_bp
     app.register_blueprint(api_key_bp)
+    from .routes.dashboard_routes import dashboard_bp
+    app.register_blueprint(dashboard_bp)
+    from .routes.response_routes import response_bp
+    app.register_blueprint(response_bp)
 
     # Debug statement
     print("Routes registered successfully!")

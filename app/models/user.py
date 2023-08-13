@@ -1,3 +1,5 @@
+# user.py 
+
 from app import db
 from flask_security import UserMixin
 from werkzeug.security import check_password_hash, generate_password_hash
@@ -11,7 +13,7 @@ class User(UserMixin, db.Model):
 	active = db.Column(db.Boolean, default=True, nullable=False)
 	api_keys = db.relationship('APIKey', backref='user', lazy=True)
 	prompts = db.relationship('Prompt', backref='user', lazy=True)
-	responses = db.relationship('Response', backref='user', lazy=True)
+	responses = db.relationship('Response', backref='user_or_prompt', lazy=True)
 	__table_args__ = (CheckConstraint('length(username) > 1'), )
 
 	def to_dict(self):

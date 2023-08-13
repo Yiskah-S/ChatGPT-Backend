@@ -6,11 +6,12 @@ from app import db
 from app.models.api_key import APIKey
 from app.models.user import User
 
-api_key_bp = Blueprint('api_key', __name__, url_prefix='/api-keys/<int:user_id>')
+api_key_bp = Blueprint('api_key', __name__, url_prefix='/api-keys/<int:user_id>/')
 
 @login_required
 @api_key_bp.route('/', methods=['GET'])
 def get_api_keys(user_id):
+    # debug
     print(f"Current user id: {current_user.get_id()}")
 
     api_keys = APIKey.query.filter_by(user_id=user_id).all()
@@ -19,6 +20,7 @@ def get_api_keys(user_id):
         return jsonify({"error": "No API keys found for this user."}), 404
 
     api_keys_data = [api_key.to_dict() for api_key in api_keys]
+    # debug
     print(f"API keys data: {api_keys_data}")
     return jsonify(api_keys_data), 200
 
@@ -26,6 +28,7 @@ def get_api_keys(user_id):
 @api_key_bp.route('/', methods=['PUT'])
 def update_api_key(user_id):
 	data = request.get_json()
+	# debug
 	print("Received data:", data)
 	print(f"Current user id: {current_user.get_id()}")
 
