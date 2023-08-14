@@ -44,6 +44,7 @@ def create_app():
 
     # Get CORS_ORIGIN from the .env file
     cors_origin = os.environ.get("CORS_ORIGIN")
+    print("CORS_ORIGIN:", cors_origin)
 
     # Configure CORS using the loaded value
     CORS(app, resources={r"/*": {"origins": cors_origin}})
