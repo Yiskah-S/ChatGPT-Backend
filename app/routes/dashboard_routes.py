@@ -17,33 +17,38 @@ dashboard_bp = Blueprint('dashboard', __name__, url_prefix='/dashboard/<int:user
 @login_required
 @dashboard_bp.route('/', methods=['POST'])
 def run_crawler(user_id):
-    data = request.get_json()
-    print("Request body:", data)
-    prompt_id = data.get('prompt_id')
-    print("prompt_id:", prompt_id)
-    target_website = data.get('targetWebsite')
-    print("Got the stuff I need from the request body!")
+	data = request.get_json()
+	print("Request body:", data)
+	prompt_id = data.get('prompt_id')
+	print("prompt_id:", prompt_id)
+	target_website = data.get('targetWebsite')
+	print("Got the stuff I need from the request body!")
 
-    prompt_obj = Prompt.query.filter_by(user_id=user_id, id=prompt_id).first()
-    print("Prompt object:", prompt_obj)
-    if prompt_obj:
-        prompt_text = prompt_obj.prompt
-        print("Prompt_text:", prompt_text)
+	prompt_obj = Prompt.query.filter_by(user_id=user_id, id=prompt_id).first()
+	print("Prompt object:", prompt_obj)
+	if prompt_obj:
+		prompt_text = prompt_obj.prompt
+		print("Prompt_text:", prompt_text)
 
-    # Extract content
-    content = extract_content(target_website)
-    print("Got the content!")
+	# Extract content
+	content = extract_content(target_website)
+	print("Got the content!")
 
-    # Generate response
-    response_text = generate_response(user_id, prompt_text, content)
-    print("Got the response!")
+	# Generate response
+	response_text = generate_response(user_id, prompt_text, content)
+	print("Response text:", response_text)
+	print("Got the response!")
 
-    # Save the response in the database
-    response_obj = Response(target_website=target_website, prompt_id=prompt_id, prompt_text=prompt_text, response_text=response_text, user_id=user_id)
-    db.session.add(response_obj)
-    db.session.commit()
+	# Save the response in the database
+	response_obj = Response(target_website=target_website, prompt_id=prompt_id, prompt_text=prompt_text, response_text=response_text, user_id=user_id)
+	db.session.add(response_obj)
+	db.session.commit()
+	response_id = response_obj.id
+	print("Response ID:", response_id)
 
-    return jsonify(message='Success', response_id=response_obj.id), 200
+	# Return both the response ID and the response text
+	return jsonify(message='Success', response_id=response_id, response_text=response_text), 200
+
 
 @login_required
 @dashboard_bp.route('/save/', methods=['POST'])
