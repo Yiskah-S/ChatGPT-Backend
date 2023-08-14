@@ -14,7 +14,7 @@ api_key_bp = Blueprint('api_key', __name__, url_prefix='/api-keys/<int:user_id>/
 @login_required
 @api_key_bp.route('/', methods=['GET'])
 def get_api_keys(user_id):
-    logging.debug(f"Current user id: {user_id()}")
+    logging.debug(f"Current user id: {user_id}")
     # print(f"Current user id: {user_id()}")
     api_keys = APIKey.query.filter_by(user_id=user_id).all()
 
@@ -31,7 +31,7 @@ def get_api_keys(user_id):
 def update_api_key(user_id):
     data = request.get_json()
     logging.debug("Received data: " + str(data))
-    logging.debug(f"Current user id: {user_id()}")
+    logging.debug(f"Current user id: {user_id}")
     # print("Received data:", data)
     # print(f"Current user id: {user_id()}")
     api_keys = data.get('apiKeys')
