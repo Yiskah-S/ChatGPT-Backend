@@ -20,32 +20,26 @@ dashboard_bp = Blueprint('dashboard', __name__, url_prefix='/dashboard/<int:user
 @dashboard_bp.route('/', methods=['POST'])
 def run_crawler(user_id):
     data = request.get_json()
-    # print("Request body:", data)
-    logging.debug("Request body: " + str(data))
+    print("Request body:", data)
     prompt_id = data.get('prompt_id')
-    # print("prompt_id:", prompt_id)
-    logging.debug("prompt_id: " + str(data.get('prompt_id')))
+    print("prompt_id:", prompt_id)
     target_website = data.get('targetWebsite')
-    logging.debug("Got the stuff I need from the request body!")
-    # print("Got the stuff I need from the request body!")
+    print("Got the stuff I need from the request body!")
 
     prompt_obj = Prompt.query.filter_by(user_id=user_id, id=prompt_id).first()
-    logging.debug("Prompt object: " + str(prompt_obj))
-    # print("Prompt object:", prompt_obj)
+    print("Prompt object:", prompt_obj)
     if prompt_obj:
         prompt_text = prompt_obj.prompt
         logging.debug("Prompt_text: " + str(prompt_text))
-        # print("Prompt_text:", prompt_text)
+        print("Prompt_text:", prompt_text)
 
     # Extract content
     content = extract_content(target_website)
-    logging.debug("Got the content!")
-    # print("Got the content!")
+    print("Got the content!")
 
     # Generate response
     response_text = generate_response(user_id, prompt_text, content)
-    logging.debug("Got the response!")
-    # print("Got the response!")
+    print("Got the response!")
 
     # Save the response in the database
     response_obj = Response(target_website=target_website, prompt_id=prompt_id, prompt_text=prompt_text, response_text=response_text, user_id=user_id)
@@ -58,10 +52,9 @@ def run_crawler(user_id):
 @dashboard_bp.route('/save/', methods=['POST'])
 def save_results(user_id):
     response_id = request.json.get('response_id')
-    # print("Response ID:", response_id)
-    logging.debug("Response ID: " + str(response_id))
+    print("Response ID:", response_id)
     output_format = request.json.get('outputFormat')
-    # print("Output format:", output_format)
+    print("Output format:", output_format)
     logging.debug("Output format: " + str(request.json.get('outputFormat')))
 
     if not response_id or not output_format:
@@ -73,8 +66,7 @@ def save_results(user_id):
     if response_to_save and response_to_save.user_id == user_id:
         try:
             save_to_notion(response_to_save.response_text, user_id)
-            logging.debug("Did it!")
-            # print("Did it!")
+            print("Did it!")
             return jsonify({"message": "Saved successfully"}), 200
         except Exception as e:
             return jsonify({"error": str(e)}), 500

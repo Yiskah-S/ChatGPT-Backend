@@ -10,3 +10,5 @@ from app import db
 def save_to_notion(response, user_id):
     print("Saving to Notion...")
     return "Saved to Notion!"
+
+

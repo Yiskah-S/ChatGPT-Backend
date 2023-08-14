@@ -4,13 +4,12 @@ import os
 from dotenv import load_dotenv
 import openai
 from app.models.api_key import APIKey
-from app.models.prompt import Prompt
 
 # Load the .env file
 load_dotenv()
 
 openai.api_key = os.getenv("OPENAI_API_KEY")
-# print("OpenAI API Key:", openai.api_key)
+print("OpenAI API Key:", openai.api_key)
 
 def generate_response(user_id, prompt_text, content):
     print("Generating response...")
@@ -20,7 +19,7 @@ def generate_response(user_id, prompt_text, content):
 
     chatgpt_api_key_record = APIKey.query.filter_by(user_id=user_id, api_type='chatgptKey').first()
     chatgpt_api_key = chatgpt_api_key_record.api_key if chatgpt_api_key_record else None
-    # print("ChatGPT API Key:", chatgpt_api_key)
+    print("ChatGPT API Key:", chatgpt_api_key)
 
     response_text = execute_prompt(prompt_text, content)
     print("Response:", response_text)
