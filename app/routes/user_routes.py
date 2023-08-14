@@ -64,7 +64,7 @@ def logout():
 @login_required
 @user_bp.route('/me', methods=['GET'])
 def get_user():
-    return jsonify(current_user.to_dict()), 200
+	return jsonify(current_user.to_dict()), 200
 
 # Update the current logged in user
 @login_required
@@ -93,11 +93,11 @@ def update_user():
 @login_required
 @user_bp.route('/me/', methods=['DELETE'])
 def delete_user():
-    db.session.delete(current_user)
-    db.session.commit()
-    return jsonify({"message": "User deleted"}), 200
+	db.session.delete(current_user)
+	db.session.commit()
+	return jsonify({"message": "User deleted"}), 200
 
 @login_required
 @user_bp.route('/protected_resource/')
 def protected_resource():
-    return jsonify({'message': 'This is a protected resource!', 'current_user_id': current_user.get_id()}), 200
+	return jsonify({'message': 'This is a protected resource!', 'current_user_id': current_user.get_id()}), 200
