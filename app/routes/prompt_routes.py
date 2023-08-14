@@ -12,10 +12,10 @@ prompt_bp = Blueprint('prompt', __name__, url_prefix='/prompts/<int:user_id>/')
 @prompt_bp.route('/', methods=['POST'])
 def create_prompt(user_id):
     logging.debug(f"Current user id: {current_user.get_id()}")
-    logging.debug(f"User id from URL: {user_id}")
-    logging.debug(f"Request body: {request.get_json()}")
     # print(f"Current user id: {current_user.get_id()}")
+    logging.debug(f"User id from URL: {user_id}")
     # print(f"User id from URL: {user_id}")
+    logging.debug(f"Request body: {request.get_json()}")
     # print(f"Request body: {request.get_json()}")
 
     data = request.get_json()
@@ -36,7 +36,15 @@ def get_prompts(user_id):
     return jsonify(prompts_data), 200
 
 @login_required
-@prompt_bp.route('/<int:prompt_id>', methods=['PUT'])
+@prompt_bp.route('/<int:prompt_id>/', methods=['GET'])
+def get_prompt(user_id, prompt_id):
+	prompt = Prompt.query.filter_by(user_id=user_id, id=prompt_id).first()
+	if not prompt:
+		return jsonify({"error": "Prompt not found."}), 404
+	return jsonify(prompt.to_dict()), 200
+
+@login_required
+@prompt_bp.route('/<int:prompt_id>/', methods=['PUT'])
 def update_prompt(user_id, prompt_id):
     data = request.get_json()
     logging.debug("Received data: " + str(data))
@@ -52,7 +60,7 @@ def update_prompt(user_id, prompt_id):
     return jsonify(prompt.to_dict()), 200
 
 @login_required
-@prompt_bp.route('/<int:prompt_id>', methods=['DELETE'])
+@prompt_bp.route('/<int:prompt_id>/', methods=['DELETE'])
 def delete_prompt(user_id, prompt_id):
     prompt = Prompt.query.get(prompt_id)
     if not prompt:
@@ -60,3 +68,25 @@ def delete_prompt(user_id, prompt_id):
     db.session.delete(prompt)
     db.session.commit()
     return jsonify({"message": "Prompt successfully deleted."}), 200
+
+@login_required
+@prompt_bp.route('/categories/', methods=['GET'])
+def get_prompt_categories(user_id):
+	prompts = Prompt.query.filter_by(user_id=user_id).all()
+	
+	if not prompts:
+		return jsonify({"error": "No prompts found for this user."}), 404
+	
+	categories = {prompt.category for prompt in prompts}
+	return jsonify(list(categories)), 200
+
+@login_required
+@prompt_bp.route('/categories/<string:category>/', methods=['GET'])
+def get_prompts_by_category(user_id, category):
+	prompts = Prompt.query.filter_by(user_id=user_id, category=category).all()
+	
+	if not prompts:
+		return jsonify({"error": "No prompts found for this user."}), 404
+	
+	prompts_data = [prompt.to_dict() for prompt in prompts]
+	return jsonify(prompts_data), 200
