@@ -62,7 +62,7 @@ def logout():
 
 # Get the current logged in user
 @login_required
-@user_bp.route('/me', methods=['GET'])
+@user_bp.route('/me/', methods=['GET'])
 def get_user():
 	return jsonify(current_user.to_dict()), 200
 
