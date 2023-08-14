@@ -5,10 +5,10 @@ from flask_login import current_user, login_user, logout_user, login_required
 from werkzeug.security import generate_password_hash
 from app.models.user import User, db
 
-user_bp = Blueprint('user', __name__)
+user_bp = Blueprint('user', __name__, url_prefix='/users/')
 
 # Create a new user
-@user_bp.route('/users', methods=['POST'])
+@user_bp.route('/', methods=['POST'])
 def create_user():
 	data = request.json
 	username = data.get('username')
@@ -33,14 +33,14 @@ def create_user():
 	return jsonify(new_user.to_dict()), 201
 
 # Get all users
-@user_bp.route('/users', methods=['GET'])
+@user_bp.route('/', methods=['GET'])
 def get_users():
 	users = User.query.all()
 	users_data = [user.to_dict() for user in users]
 	return jsonify(users_data), 200
 
 # User login
-@user_bp.route('/users/login', methods=['POST'])
+@user_bp.route('/login/', methods=['POST'])
 def login():
 	data = request.get_json()
 	email = data.get('email')
@@ -55,20 +55,20 @@ def login():
 
 # User logout
 @login_required
-@user_bp.route('/users/logout', methods=['POST'])
+@user_bp.route('/logout/', methods=['POST'])
 def logout():
 	logout_user()
 	return jsonify({"message": "Logged out"}), 200
 
 # Get the current logged in user
 @login_required
-@user_bp.route('/users/me', methods=['GET'])
+@user_bp.route('/me', methods=['GET'])
 def get_user():
     return jsonify(current_user.to_dict()), 200
 
 # Update the current logged in user
 @login_required
-@user_bp.route('/users/me', methods=['PATCH'])
+@user_bp.route('/me/', methods=['PATCH'])
 def update_user():
 	data = request.get_json()
 	username = data.get('username')
@@ -91,26 +91,13 @@ def update_user():
 
 # Delete the current logged in user
 @login_required
-@user_bp.route('/users/me', methods=['DELETE'])
+@user_bp.route('/me/', methods=['DELETE'])
 def delete_user():
     db.session.delete(current_user)
     db.session.commit()
     return jsonify({"message": "User deleted"}), 200
 
 @login_required
-@user_bp.route('/protected_resource')
+@user_bp.route('/protected_resource/')
 def protected_resource():
     return jsonify({'message': 'This is a protected resource!', 'current_user_id': current_user.get_id()}), 200
-
-@login_required
-@user_bp.route('/dashboard', methods=['GET'])
-def dashboard():
-    user = User.query.get(current_user_id)
-    print("Current user ID:", current_user_id)
-    print("User:", user)
-
-    if user:
-        user_data = user.to_dict()
-        return jsonify(user_data), 200
-    else:
-        return jsonify({"message": "User not found"}), 404

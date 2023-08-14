@@ -18,11 +18,13 @@ dashboard_bp = Blueprint('dashboard', __name__, url_prefix='/dashboard/<int:user
 @dashboard_bp.route('/', methods=['POST'])
 def run_crawler(user_id):
     data = request.get_json()
-    logging.debug("Request body: " + str(data))
-    logging.debug("prompt_id: " + str(data.get('prompt_id')))
-    logging.debug("Got the stuff I need from the request body!")
     # print("Request body:", data)
+    logging.debug("Request body: " + str(data))
+    prompt_id = data.get('prompt_id')
     # print("prompt_id:", prompt_id)
+    logging.debug("prompt_id: " + str(data.get('prompt_id')))
+    target_website = data.get('targetWebsite')
+    logging.debug("Got the stuff I need from the request body!")
     # print("Got the stuff I need from the request body!")
 
     prompt_obj = Prompt.query.filter_by(user_id=user_id, id=prompt_id).first()
@@ -54,10 +56,11 @@ def run_crawler(user_id):
 @dashboard_bp.route('/save/', methods=['POST'])
 def save_results(user_id):
     response_id = request.json.get('response_id')
-    logging.debug("Response ID: " + str(response_id))
-    logging.debug("Output format: " + str(request.json.get('outputFormat')))
     # print("Response ID:", response_id)
+    logging.debug("Response ID: " + str(response_id))
+    output_format = request.json.get('outputFormat')
     # print("Output format:", output_format)
+    logging.debug("Output format: " + str(request.json.get('outputFormat')))
 
     if not response_id or not output_format:
         return jsonify({"error": "Response ID and output format are required"}), 440
