@@ -1,6 +1,5 @@
 # dashboard_routes.py 
 
-import logging
 from flask import Blueprint, jsonify, request, session
 from flask_login import login_required, current_user
 from app import db
@@ -12,7 +11,6 @@ from app.chatgpt import generate_response
 from app.notion import save_to_notion
 from app.models.response import Response
 
-logging.basicConfig(level=logging.DEBUG)
 
 dashboard_bp = Blueprint('dashboard', __name__, url_prefix='/dashboard/<int:user_id>/')
 
@@ -30,7 +28,6 @@ def run_crawler(user_id):
     print("Prompt object:", prompt_obj)
     if prompt_obj:
         prompt_text = prompt_obj.prompt
-        logging.debug("Prompt_text: " + str(prompt_text))
         print("Prompt_text:", prompt_text)
 
     # Extract content
@@ -55,7 +52,6 @@ def save_results(user_id):
     print("Response ID:", response_id)
     output_format = request.json.get('outputFormat')
     print("Output format:", output_format)
-    logging.debug("Output format: " + str(request.json.get('outputFormat')))
 
     if not response_id or not output_format:
         return jsonify({"error": "Response ID and output format are required"}), 440

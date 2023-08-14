@@ -1,24 +1,19 @@
 #  prompt_routes.py 
 
-import logging
 from flask import Blueprint, jsonify, request
 from flask_login import login_required, current_user, login_user, logout_user
 from app import db
 from app.models.prompt import Prompt
 
-logging.basicConfig(level=logging.DEBUG)
 
 prompt_bp = Blueprint('prompt', __name__, url_prefix='/prompts/<int:user_id>/')
 
 @login_required
 @prompt_bp.route('/', methods=['POST'])
 def create_prompt(user_id):
-    logging.debug(f"Current user id: {current_user.get_id()}")
-    # print(f"Current user id: {current_user.get_id()}")
-    logging.debug(f"User id from URL: {user_id}")
-    # print(f"User id from URL: {user_id}")
-    logging.debug(f"Request body: {request.get_json()}")
-    # print(f"Request body: {request.get_json()}")
+    print(f"Current user id: {current_user.get_id()}")
+    print(f"User id from URL: {user_id}")
+    print(f"Request body: {request.get_json()}")
 
     data = request.get_json()
     new_prompt = Prompt.from_dict(data, user_id=user_id)
@@ -49,8 +44,7 @@ def get_prompt(user_id, prompt_id):
 @prompt_bp.route('/<int:prompt_id>/', methods=['PUT'])
 def update_prompt(user_id, prompt_id):
     data = request.get_json()
-    logging.debug("Received data: " + str(data))
-    # print("Received data:", data)
+    print("Received data:", data)
     prompt = Prompt.query.filter_by(user_id=user_id, id=prompt_id).first()
 
     if not prompt:
