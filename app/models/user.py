@@ -6,6 +6,7 @@ from werkzeug.security import check_password_hash, generate_password_hash
 from sqlalchemy import CheckConstraint
 
 class User(UserMixin, db.Model):
+	# Columns definition
 	id = db.Column(db.Integer, primary_key=True)
 	username = db.Column(db.String(80), unique=True, nullable=False)
 	email = db.Column(db.String(120), unique=True, nullable=False)
@@ -16,6 +17,7 @@ class User(UserMixin, db.Model):
 	responses = db.relationship('Response', backref='user_or_prompt', lazy=True)
 	__table_args__ = (CheckConstraint('length(username) > 1'), )
 
+	# Convert the object into a dictionary
 	def to_dict(self):
 		user_dict = {
 			"id": self.id,

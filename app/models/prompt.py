@@ -3,6 +3,7 @@
 from app import db
 
 class Prompt(db.Model):
+	# Columns definition
 	id = db.Column(db.Integer, primary_key=True)
 	title = db.Column(db.String(100), nullable=False)
 	category = db.Column(db.String(50), nullable=False)
@@ -10,6 +11,7 @@ class Prompt(db.Model):
 	user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
 	responses = db.relationship('Response', backref='prompt', lazy=True)
 
+	# Convert the object into a dictionary
 	def to_dict(self):
 		prompt_dict = {
 			"id": self.id,
@@ -21,6 +23,7 @@ class Prompt(db.Model):
 		}
 		return prompt_dict
 
+	# Create an object from a dictionary
 	@classmethod
 	def from_dict(cls, request_body, user_id):
 		return cls(
@@ -30,6 +33,7 @@ class Prompt(db.Model):
 			user_id=user_id,
 		)
 
+	# Update the object with new data
 	def update(self, data):
 		for key, item in data.items():
 			setattr(self, key, item)

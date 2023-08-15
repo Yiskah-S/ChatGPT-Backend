@@ -3,6 +3,7 @@
 from app import db
 
 class Response(db.Model):
+    # Columns definition
     id = db.Column(db.Integer, primary_key=True)
     target_website = db.Column(db.String(1000), nullable=False) # URL of the target website
     prompt_id = db.Column(db.Integer, db.ForeignKey('prompt.id'), nullable=False)          # The generated response text
@@ -10,6 +11,7 @@ class Response(db.Model):
     response_text = db.Column(db.Text, nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False) # Foreign key to the User
 
+    # Convert the object into a dictionary
     def to_dict(self):
         response_dict = {
             "id": self.id,
@@ -21,6 +23,7 @@ class Response(db.Model):
         }
         return response_dict
 
+    # Create an object from a dictionary
     @classmethod
     def from_dict(cls, request_body, user_id):
         return cls(

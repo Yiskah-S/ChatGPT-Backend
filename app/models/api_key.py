@@ -3,11 +3,13 @@
 from app import db
 
 class APIKey(db.Model):
+	# Columns definition
 	id = db.Column(db.Integer, primary_key=True)
 	api_type = db.Column(db.String(120), nullable=False)
 	api_key = db.Column(db.String(120), nullable=False)
 	user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
 
+	# Convert the object into a dictionary
 	def to_dict(self):
 		api_key_dict = {
 			"id": self.id,
@@ -17,6 +19,7 @@ class APIKey(db.Model):
 		}
 		return api_key_dict
 
+	# Create an object from a dictionary
 	@classmethod
 	def from_dict(cls, request_body):
 		return cls(
@@ -25,6 +28,7 @@ class APIKey(db.Model):
 			user_id=request_body["user_id"],
 		)
 	
+	# Update the object with new data
 	def update(self, data):
 		for key, item in data.items():
 			setattr(self, key, item)
