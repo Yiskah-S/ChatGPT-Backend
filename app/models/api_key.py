@@ -1,6 +1,7 @@
 # api_key.py
 
 from app import db
+from typing import Dict
 
 class APIKey(db.Model):
 	# Columns definition
@@ -10,7 +11,7 @@ class APIKey(db.Model):
 	user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
 
 	# Convert the object into a dictionary
-	def to_dict(self):
+	def to_dict(self) -> Dict[str, any]:
 		api_key_dict = {
 			"id": self.id,
 			"api_type": self.api_type,
@@ -21,7 +22,7 @@ class APIKey(db.Model):
 
 	# Create an object from a dictionary
 	@classmethod
-	def from_dict(cls, request_body):
+	def from_dict(cls, request_body: Dict[str, any]) -> 'APIKey':
 		return cls(
 			api_type=request_body["api_type"],
 			api_key=request_body["api_key"],
@@ -29,6 +30,6 @@ class APIKey(db.Model):
 		)
 	
 	# Update the object with new data
-	def update(self, data):
+	def update(self, data: Dict[str, any]) -> None:
 		for key, item in data.items():
 			setattr(self, key, item)

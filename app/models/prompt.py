@@ -1,9 +1,9 @@
 # prompt.py 
 
 from app import db
+from typing import Dict, List
 
 class Prompt(db.Model):
-	# Columns definition
 	id = db.Column(db.Integer, primary_key=True)
 	title = db.Column(db.String(100), nullable=False)
 	category = db.Column(db.String(50), nullable=False)
@@ -11,8 +11,7 @@ class Prompt(db.Model):
 	user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
 	responses = db.relationship('Response', backref='prompt', lazy=True)
 
-	# Convert the object into a dictionary
-	def to_dict(self):
+	def to_dict(self) -> Dict[str, any]:
 		prompt_dict = {
 			"id": self.id,
 			"title": self.title,
@@ -23,9 +22,8 @@ class Prompt(db.Model):
 		}
 		return prompt_dict
 
-	# Create an object from a dictionary
 	@classmethod
-	def from_dict(cls, request_body, user_id):
+	def from_dict(cls, request_body: Dict[str, any], user_id: int) -> 'Prompt':
 		return cls(
 			title=request_body["title"],
 			category=request_body["category"],
@@ -33,7 +31,6 @@ class Prompt(db.Model):
 			user_id=user_id,
 		)
 
-	# Update the object with new data
-	def update(self, data):
+	def update(self, data: Dict[str, any]) -> None:
 		for key, item in data.items():
 			setattr(self, key, item)
