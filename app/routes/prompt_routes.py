@@ -1,26 +1,23 @@
 #  prompt_routes.py 
 
 from flask import Blueprint, jsonify, request
-from flask_login import login_required, current_user, login_user, logout_user
-from app import db
+from flask_login import login_required, current_user
 from app.models.prompt import Prompt
-
+from app import db
 
 prompt_bp = Blueprint('prompt', __name__, url_prefix='/prompts/<int:user_id>/')
 
+# Create a new prompt
 @login_required
 @prompt_bp.route('/', methods=['POST'])
 def create_prompt(user_id):
-    print(f"Current user id: {current_user.get_id()}")
-    print(f"User id from URL: {user_id}")
-    print(f"Request body: {request.get_json()}")
+	data = request.get_json()
+	new_prompt = Prompt.from_dict(data, user_id=user_id)
+	db.session.add(new_prompt)
+	db.session.commit()
+	return jsonify(new_prompt.to_dict()), 201
 
-    data = request.get_json()
-    new_prompt = Prompt.from_dict(data, user_id=user_id)
-    db.session.add(new_prompt)
-    db.session.commit()
-    return jsonify(new_prompt.to_dict()), 201
-
+# Get all prompts for a user
 @login_required
 @prompt_bp.route('/', methods=['GET'])
 def get_prompts(user_id):
@@ -32,6 +29,7 @@ def get_prompts(user_id):
     prompts_data = [prompt.to_dict() for prompt in prompts]
     return jsonify(prompts_data), 200
 
+# Get a single prompt
 @login_required
 @prompt_bp.route('/<int:prompt_id>/', methods=['GET'])
 def get_prompt(user_id, prompt_id):
@@ -40,6 +38,7 @@ def get_prompt(user_id, prompt_id):
         return jsonify({"error": "Prompt not found."}), 404
     return jsonify(prompt.to_dict()), 200
 
+# Update a single prompt
 @login_required
 @prompt_bp.route('/<int:prompt_id>/', methods=['PUT'])
 def update_prompt(user_id, prompt_id):
@@ -55,6 +54,7 @@ def update_prompt(user_id, prompt_id):
 
     return jsonify(prompt.to_dict()), 200
 
+# Delete a single prompt
 @login_required
 @prompt_bp.route('/<int:prompt_id>/', methods=['DELETE'])
 def delete_prompt(user_id, prompt_id):
@@ -65,6 +65,7 @@ def delete_prompt(user_id, prompt_id):
     db.session.commit()
     return jsonify({"message": "Prompt successfully deleted."}), 200
 
+# Get all categories for a user
 @login_required
 @prompt_bp.route('/categories/', methods=['GET'])
 def get_prompt_categories(user_id):
@@ -76,6 +77,7 @@ def get_prompt_categories(user_id):
     categories = {prompt.category for prompt in prompts}
     return jsonify(list(categories)), 200
 
+# Get all prompts for a user by category
 @login_required
 @prompt_bp.route('/categories/<string:category>/', methods=['GET'])
 def get_prompts_by_category(user_id, category):
