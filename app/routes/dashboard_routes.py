@@ -14,7 +14,29 @@ from app import db
 
 dashboard_bp = Blueprint('dashboard', __name__, url_prefix='/dashboard/<int:user_id>/')
 
-# Run the web crawler and generate a response
+# # Run the web crawler and generate a response
+# @login_required
+# @dashboard_bp.route('/', methods=['POST'])
+# def run_crawler(user_id):
+# 	data = request.get_json()
+# 	prompt_id = data.get('prompt_id')
+# 	target_website = data.get('targetWebsite')
+
+# 	prompt_obj = Prompt.query.filter_by(user_id=user_id, id=prompt_id).first()
+# 	if prompt_obj:
+# 		prompt_text = prompt_obj.prompt
+
+# 	content = extract_content(target_website)
+# 	response_text = generate_response(user_id, prompt_text, content)
+# 	response_obj = Response(target_website=target_website, prompt_id=prompt_id, prompt_text=prompt_text, response_text=response_text, user_id=user_id)
+# 	db.session.add(response_obj)
+# 	db.session.commit()
+# 	response_id = response_obj.id
+
+# 	return jsonify(message='Success', response_id=response_id, response_text=response_text), 200
+
+# Other imports are same
+
 @login_required
 @dashboard_bp.route('/', methods=['POST'])
 def run_crawler(user_id):
@@ -26,14 +48,15 @@ def run_crawler(user_id):
 	if prompt_obj:
 		prompt_text = prompt_obj.prompt
 
-	content = extract_content(target_website)
-	response_text = generate_response(user_id, prompt_text, content)
+	content, token_count = extract_content(target_website)
+	response_text = generate_response(user_id, prompt_text, content, token_count) # Added token_count here
 	response_obj = Response(target_website=target_website, prompt_id=prompt_id, prompt_text=prompt_text, response_text=response_text, user_id=user_id)
 	db.session.add(response_obj)
 	db.session.commit()
 	response_id = response_obj.id
 
 	return jsonify(message='Success', response_id=response_id, response_text=response_text), 200
+
 
 # Save the response to Notion
 @login_required
